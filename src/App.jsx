@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -10,8 +10,11 @@ function App() {
   const [tank2, setTank2] = useState(0)
   const [tank3, setTank3] = useState(0)
   const [tank4, setTank4] = useState(0)
+  const[trigger, setTrigger] = useState(false);
+  const[roundoff, setroundoff] = useState(false);
   let startTime = useRef(d1.getTime());
-  async function EvenlySpreadOut() {
+  useEffect(() => {
+    async function EvenlySpreadOut() {
     console.log("hi", startTime.current - d.getTime(), d1.getTime());
     let total = tank1 + tank2 + tank3 + tank4;
     let average = Math.floor(total / 4);
@@ -36,67 +39,76 @@ function App() {
       setTank2(prevTank2 => prevTank2 + v2);
       setTank3(prevTank3 => prevTank3 + v3);
       setTank4(prevTank4 => prevTank4 + v4);
+      totalTime--;
       if(totalTime){
         setTimeout(updateTanks, 1000);
       }
-      totalTime--;
     };
 
     await updateTanks();
-    setTank1(Math.round(tank1));
-    setTank2(Math.round(tank2));
-    setTank3(Math.round(tank3));
-    setTank4(Math.round(tank4));
   }
-    const handleMouseUp1 = async () => {
+
+    EvenlySpreadOut();
+  }, [trigger]);
+    const roundOff = useCallback(() =>{
+      setTank1(prev => Math.round(prev*100)/100)
+      setTank2(prev => Math.round(prev*100)/100)
+      setTank3(prev => Math.round(prev*100)/100)
+      setTank4(prev => Math.round(prev*100)/100)
+    }, [roundoff]);
+       const handleMouseUp1 = () => {
       const endTime = new Date().getTime();
       const duration = endTime - startTime.current;
       console.log(duration);
       setTank1(prevtank => Math.min(1000, prevtank + Math.floor((duration / 1000)) * 200));
-      await EvenlySpreadOut();
+      setTrigger(prev => !prev);setroundoff(prev=>!prev);
+      //await EvenlySpreadOut();
     };
-    const handleMouseDown1 = async() => {
-      startTime.current = d.getTime();
+    const handleMouseDown1 = () => {
+      startTime.current = new Date().getTime();
       console.log("kya mai update hua?", startTime.current);
     };
   
-    const handleMouseUp2 = async () => {
+    const handleMouseUp2 = () => {
       const endTime = new Date().getTime();
       const duration = endTime - startTime.current;
       setTank2(prevtank => Math.min(1000, prevtank + Math.floor((duration / 1000)) * 200));
-      await EvenlySpreadOut();
+      setTrigger(prev => !prev);setroundoff(prev=>!prev);
+     // await EvenlySpreadOut();
     };
   
-    const handleMouseUp3 = async () => {
+    const handleMouseUp3 = () => {
       const endTime = new Date().getTime();
       const duration = endTime - startTime.current;
       setTank3(prevtank => Math.min(1000, prevtank + Math.floor((duration / 1000)) * 200));
-      await EvenlySpreadOut();
+      setTrigger(prev => !prev);setroundoff(prev=>!prev);
+      //await EvenlySpreadOut();
     };
   
-    const handleMouseUp4 = async () => {
+    const handleMouseUp4 = () => {
       const endTime = new Date().getTime();
       const duration = endTime - startTime.current;
       setTank4(prevtank => Math.min(1000, prevtank + Math.floor((duration / 1000)) * 200));
-      await EvenlySpreadOut();
+      setTrigger(prev => !prev);setroundoff(prev=>!prev);
+      //await EvenlySpreadOut();
     };
     
 
   const handleClick1 = async () => {
-    setTank1(0);
+    setTank1(0);setTrigger(prev => !prev);setroundoff(prev=>!prev);
    // await EvenlySpreadOut();
   }
 
   const handleClick2 = async () => {
-    setTank2(0);
+    setTank2(0);setTrigger(prev => !prev);setroundoff(prev=>!prev);
    // await EvenlySpreadOut();
   }
   const handleClick3 = async () => {
-    setTank3(0);
+    setTank3(0);setTrigger(prev => !prev);setroundoff(prev=>!prev);
     //await EvenlySpreadOut();
   }
   const handleClick4 = async () => {
-    setTank4(0);
+    setTank4(0);setTrigger(prev => !prev);setroundoff(prev=>!prev);
     //await EvenlySpreadOut();
   }
 
@@ -111,7 +123,7 @@ function App() {
           
           </div>
           <div>
-            {Math.round(tank1)}
+            {(tank1)}
           </div>
         </div>
         <div className='col col-3'>
@@ -122,7 +134,7 @@ function App() {
             <button className='button2 btn btn-primary' onClick = {handleClick2}>empty</button>
           
           </div>
-          <div>{Math.round(tank2)}</div>
+          <div>{(tank2)}</div>
         </div>
         <div className='col col-3'>
           tank 3
@@ -131,7 +143,7 @@ function App() {
             <button className='button3 btn btn-primary' onClick = {handleClick3}>empty</button>
           
           </div>
-          <div>{Math.round(tank3)}</div>
+          <div>{(tank3)}</div>
         </div>
         <div className='button4 col col-3'>
           tank 4
@@ -140,7 +152,7 @@ function App() {
             <button className='button4 btn btn-primary' onClick = {handleClick4}>empty</button>
           
           </div>
-          <div>{Math.round(tank4)}</div>
+          <div>{(tank4)}</div>
         </div>
       </div>
     </>
